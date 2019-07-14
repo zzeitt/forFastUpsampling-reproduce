@@ -8,13 +8,14 @@ UPSAMP.factor = 4;  % magnification factor
 UPSAMP.iter = 4;  % times of iteration
 DECONV.lambda_1 = 0.01;  % parameters
 DECONV.lambda_2 = 20;
-DECONV.iter_max =10;  % max iteration times for deconvolution
+DECONV.iter_max =10;  % max iteration times...
+%                       for deconvolution
 GAU.size = 13;  % size of gaussian kernel
 GAU.var = 1.05;  % variance of gaussian kernel
 
 %% Load original image and split channels
 % Stuff about image L (input low resolution image).
-L = im2double(imread('images/street_small.jpg'));
+L = im2double(imread('images/bw_200x200.png'));
 L = rgb2gray(L);
 L = imbinarize(L);
 
@@ -35,13 +36,19 @@ for i = 1:UPSAMP.iter
     %¡¾Normalize¡¿
     [H_tilde_norm, low, gap] = simpnormimg(H_tilde);
     
-    %¡¾Non-blind deconvolution¡¿
-    H_star = nbDeconv(H_tilde_norm, DECONV, GAU);
-    disp([newline,' ============>¡¾Iteration ', num2str(i), ' done!¡¿',newline]);
-    if(i == UPSAMP.iter),break;end
-    
+%     %¡¾Non-blind deconvolution¡¿
+%     H_star = nbDeconv(H_tilde_norm, DECONV, GAU);
+
+    %¡¾Lagrangian approach¡¿
+    kernel = fspecial('gaussian', GAU.size, GAU.var);
+    H_star = fftCGSRaL(H_tilde_norm, kernel);
+    disp([newline,' ============>¡¾Iteration ',...
+    num2str(i), ' done!¡¿',newline]);
+
     %¡¾Denormalize¡¿
     H_star = H_star*gap + low;
+    
+    if(i == UPSAMP.iter),break;end
     
     %¡¾Reconvolution¡¿
     PSF = fspecial('gaussian', GAU.size, GAU.var);
@@ -49,7 +56,8 @@ for i = 1:UPSAMP.iter
     
     %¡¾Pixel substitution¡¿
     H_tilde = H_s;
-    H_tilde(1:UPSAMP.factor:end,1:UPSAMP.factor:end) = L(:,:);
+    H_tilde(1:UPSAMP.factor:end,...
+            1:UPSAMP.factor:end) = L(:,:);
 end
 
 %% Show result
