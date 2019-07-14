@@ -1,0 +1,6 @@
+# Ignore MATLAB auto-save file
+*.asv
+
+# Ignore images
+images/*
+results/*
