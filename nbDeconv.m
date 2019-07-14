@@ -1,21 +1,18 @@
-function [H_star_ret] = nbDeconv(H_tilde_arg, ...
-    deconv, gau)
+function [H_star_ret] = nbDeconv(H_tilde_arg, deconv, gau)
 % NBDECONV ¡¾Execute non-blind deconvolution.¡¿
 %   Accept:
 %       H_tilde_arg:    degraded image
-%       lam_1:          lambda_1
-%       lam_2:          lambda_2
-%       iter_max_arg;   iteration times of
-%                       minimization loop
-%   Variables list:
+%       deconv:         deconvolution struct
+%       gau:            gaussian kernel struct
+%   Variables:
 %       g_size:         the size of image passed in,
 %                       also be the size everywhere.
 %       mu_x, mu_y:     variables used in minimization
 %       f_PSF:          convolution kernel
 %       partial_x, partial_y: gradient matrix
 %   Return:
-%       H_star_ret
-%       
+%       H_star_ret:     deconvolved image
+      
 
 %% Initialize parameters
 gau_size = gau.size;
@@ -33,8 +30,10 @@ mu_y = zeros(g_size);
 f_PSF = fspecial('gaussian', gau_size, gau_var);
 partial_x = [1 -1];
 partial_y = [1; -1];
-H_tilde_arg = edgetaper(H_tilde_arg, f_PSF);  % process border
+H_tilde_arg = edgetaper(H_tilde_arg, f_PSF);  % treat border
 F_H_star = 0;  % Initialize F_H_star
+int_min = min(H_tilde_arg(:));  % min intensity
+int_max = max(H_tilde_arg(:));  % max intensity
 
 %% Convert variables to freq-domain-vars
 % First move PSF center to origin and pad
@@ -92,10 +91,17 @@ for i = 1:iter_max
     end
     
     %% Increase lambda_2
-    lam_2 = 3 * lam_2;
+    % lam_2 = 3 * lam_2;  % Better not uncomment this!
 end
 
 %% Return H_star
 H_star_ret = real(ifft2(F_H_star));
+% Treat boundary
+mask = false(g_size);
+mask(:,:) = H_star_ret(:,:) < int_min;  % lower bound
+H_star_ret(mask) = int_min;
+mask(:,:) = H_star_ret(:,:) > int_max;  % upper bound
+H_star_ret(mask) = int_max;
+
 end
 
