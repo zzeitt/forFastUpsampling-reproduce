@@ -1,5 +1,5 @@
 function [H_star_ret] = nbDeconv(H_tilde_arg, ...
-    lam_1, lam_2, iter_max_arg)
+    deconv, gau)
 % NBDECONV ¡¾Execute non-blind deconvolution.¡¿
 %   Accept:
 %       H_tilde_arg:    degraded image
@@ -18,9 +18,12 @@ function [H_star_ret] = nbDeconv(H_tilde_arg, ...
 %       
 
 %% Initialize parameters
-gau_size = 3;
-gau_var = 1.05;
+gau_size = gau.size;
+gau_var = gau.var;
 cvg_crt = 1e-3;  % converge criterion
+iter_max = deconv.iter_max;
+lam_1 = deconv.lambda_1;
+lam_2 = deconv.lambda_2;
 
 %% Initialize variables
 g_size = size(H_tilde_arg);
@@ -52,7 +55,7 @@ tmp_down = F_f_PSF_conj.*F_f_PSF + lam_2*(...
     F_partial_y_conj.*F_partial_y);
 
 %% Iteratively minimize the energy
-for i = 1:iter_max_arg
+for i = 1:iter_max
     F_H_star_last = F_H_star;
     mu_x_last = mu_x;
     %% Estimate H_star

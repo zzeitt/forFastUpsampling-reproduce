@@ -6,9 +6,11 @@
 clear; close all; clc;
 UPSAMP.factor = 4;  % magnification factor
 UPSAMP.iter = 4;  % times of iteration
-DECOV.lambda_1 = 0.01;  % parameters
-DECOV.lambda_2 = 20;
-DECOV.iter_max =10;  % max iteration times for deconvolution
+DECONV.lambda_1 = 0.01;  % parameters
+DECONV.lambda_2 = 20;
+DECONV.iter_max =10;  % max iteration times for deconvolution
+GAU.size = 13;  % size of gaussian kernel
+GAU.var = 1.05;  % variance of gaussian kernel
 
 %% Load original image and split channels
 % Stuff about image L (input low resolution image).
@@ -30,16 +32,19 @@ H_tilde = im2double(imresize(L, UPSAMP.factor, 'bicubic'));
 
 %% Feed-back control loop (**essential step**)
 for i = 1:UPSAMP.iter
-    %¡¾Non-blind deconvolution¡¿
+    %¡¾Normalize¡¿
     [H_tilde_norm, low, gap] = simpnormimg(H_tilde);
-    H_star = nbDeconv(H_tilde_norm, DECOV.lambda_1, ...
-        DECOV.lambda_2, DECOV.iter_max);
+    
+    %¡¾Non-blind deconvolution¡¿
+    H_star = nbDeconv(H_tilde_norm, DECONV, GAU);
     disp([newline,' ============>¡¾Iteration ', num2str(i), ' done!¡¿',newline]);
     if(i == UPSAMP.iter),break;end
-    H_star = H_star*gap + low;  % denormalize
+    
+    %¡¾Denormalize¡¿
+    H_star = H_star*gap + low;
     
     %¡¾Reconvolution¡¿
-    PSF = fspecial('gaussian', 3, 1.05);
+    PSF = fspecial('gaussian', GAU.size, GAU.var);
     H_s = imfilter(H_star, PSF, 'same', 'conv');
     
     %¡¾Pixel substitution¡¿
