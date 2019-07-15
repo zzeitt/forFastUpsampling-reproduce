@@ -1,4 +1,4 @@
-function DEMO_gray_lam2(factor_arg, iter_outer,...
+function DEMO_gray_func(factor_arg, iter_outer,...
     lam_2_arg, iter_inner, gau_var)
 
 %% Initialize parameters
@@ -9,7 +9,7 @@ DECONV.lambda_2 = lam_2_arg;  % lambda_2
 DECONV.iter_max = iter_inner;  % max deconv iterations
 GAU.size = 11;  % size of gaussian kernel
 GAU.var = gau_var;  % variance of gaussian kernel
-IMG.name = 'words';
+IMG.name = 'ceremony';
 IMG.read = ['images/', IMG.name, '_small.jpg'];
 
 %% Load original image and binarize
