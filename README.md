@@ -6,7 +6,7 @@
 
 ## Structure
 * DEMO_color.m 👈 [entrance file]
-* nvDeconv.m
+* nbDeconv.m
 * optMu.m
 
 Other scripts include:
