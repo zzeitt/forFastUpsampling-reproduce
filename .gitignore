@@ -4,3 +4,6 @@
 # Ignore images
 images/*
 results/*
+
+# Whitelist cover image
+!results/cover_comparison.png
