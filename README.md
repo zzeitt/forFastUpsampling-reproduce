@@ -3,6 +3,7 @@
 > ### [*Fast image/video upsampling*][1]
 
 ![cover](https://github.com/zzeitt/Reproduce-FastUpsampling/blob/master/results/cover_comparison.png)
+> Low-resolution image vs Upsampled image, with magnification factor being 4.
 
 ## Structure
 * DEMO_color.m 👈 [entrance file]
