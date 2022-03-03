@@ -2,7 +2,7 @@
 > ### Reoproduced a paper:
 > ### [*Fast image/video upsampling*][1]
 
-![cover](https://github.com/zzeitt/Reproduce-FastUpsampling/blob/master/results/cover_comparison.png)
+![teaser](teaser.drawio.png)
 > Low-resolution image vs Upsampled image, with magnification factor being 4.
 
 ## Structure
